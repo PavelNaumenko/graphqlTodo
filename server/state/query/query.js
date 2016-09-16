@@ -28,7 +28,15 @@ const Query = new GraphQLObjectType({
 			},
 			resolve(root, { id }) {
 
-				return UserList.find(user => user.id == id);
+				let user = UserList.find(user => user.id == id);
+
+				if (!(user)) {
+
+					throw new Error('User with this id does not exist!');
+
+				}
+
+				return user;
 
 			}
 
