@@ -1,1 +1,0 @@
-export photoController from './photoController';

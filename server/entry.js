@@ -7,9 +7,6 @@ import bodyParser from 'body-parser';
 import TodoSchema from './state/schema';
 import graphqlHTTP from 'express-graphql';
 
-import Router from './routing/Router';
-import RouterConfig from './routing';
-
 const mode = process.env.NODE_ENV;
 const app = express();
 
@@ -35,8 +32,6 @@ app.use('/graphql', graphqlHTTP({
 	schema: TodoSchema,
 	graphiql: true
 }));
-
-new Router(app, RouterConfig);
 
 // Handle crashed errors
 process.on('uncaughtException', (err) => {
