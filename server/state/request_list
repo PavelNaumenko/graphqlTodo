@@ -1,0 +1,156 @@
+//
+//
+// USER REQUEST
+//
+//
+
+/*
+* Read all user
+*/
+
+{
+  users {
+    id,
+    name,
+    email,
+    tasks {
+      id
+      title,
+      text,
+      created_at
+    }
+  }
+}
+
+/*
+* Read one user
+*/
+
+{
+  user(id: "2") {
+    id,
+    name,
+    email,
+    tasks {
+      id
+      title,
+      text,
+      created_at
+    }
+  }
+}
+
+/*
+* Create user
+*/
+
+mutation insertUser {
+  user: createUser(
+    id: "4",
+    name: "Den",
+  	email: "den@gmail.com"
+  )  {
+    name
+    email
+    tasks {
+      title,
+      text,
+      created_at
+    }
+  }
+}
+
+/*
+* Update user
+*/
+
+mutation updateUser {
+  user: updateUser(
+    id: "4",
+    new_name: "Bob"
+  )  {
+    name
+    email
+    tasks {
+      title,
+      text,
+      created_at
+    }
+  }
+}
+
+/*
+* Delete user
+*/
+
+mutation deleteUser {
+  user: deleteUser(
+    id: "4"
+  )  {
+    name
+    email
+    tasks {
+      title,
+      text,
+      created_at
+    }
+  }
+}
+
+//
+//
+// TASK REQUEST
+//
+//
+
+/*
+* Create task
+*/
+
+mutation taskUser {
+  task: createTask(
+    id: "5",
+    title: "Some",
+  	text: "Some text",
+    userId: "2"
+  )  {
+    id,
+    title,
+    text,
+    created_at,
+    userId
+  }
+}
+
+/*
+* Update task
+*/
+
+mutation taskUser {
+  task: updateTask(
+    id: "5",
+    new_title: "New title"
+  )  {
+    id,
+    title,
+    text,
+    created_at,
+    userId
+  }
+}
+
+/*
+* Delete task
+*/
+
+mutation taskUser {
+  task: deleteTask(
+    id: "5"
+  )  {
+    id,
+    title,
+    text,
+    created_at,
+    userId
+  }
+}

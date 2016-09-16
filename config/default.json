@@ -1,0 +1,21 @@
+{
+
+	"development": {
+
+		"APP_NAME": "TEST API",
+		"DATABASE" : "mongodb://localhost/clearproject",
+		"URL" : "http://127.0.0.1",
+		"PORT" : "8989"
+
+	},
+
+	"production": {
+
+		"APP_NAME": "Prod server",
+		"DATABASE" : "mongodb://localhost/clearproject",
+		"URL" : "https://api.site.com",
+		"PORT" : ""
+
+	}
+
+}
