@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { graphql } from 'graphql';
 import TodoSchema from '../state/schema';
+import fetch from 'node-fetch';
 
 describe('User test', () => {
 
@@ -509,6 +510,103 @@ describe('Task test', () => {
 				done(err);
 
 			});
+
+		});
+
+	});
+
+});
+
+describe('Request test', () => {
+
+	describe('GET request', () => {
+		
+		it('should return users data', (done) => {
+			
+			fetch('http://localhost:8989/graphql?query={users{id,name,email,tasks{id,title,text,created_at}}}')
+				.then((response) => {
+
+					response.json().then((data) => {
+
+						expect(data.data.users).to.be.an('array')
+							.and.to.have.lengthOf(3);
+
+						done();
+
+					});
+
+				})
+				.catch((error) => {
+
+					console.log(error);
+					done(error);
+
+				});
+			
+		});
+
+		it('should return user by id', (done) => {
+
+			fetch('http://localhost:8989/graphql?query={user(id: "2"){id,name,email,tasks{id,title,text,created_at}}}')
+				.then((response) => {
+
+					response.json().then((data) => {
+
+						expect(data.data.user).to.be.an('object')
+							.with.property('id')
+							.that.equals('2');
+
+						done();
+
+					});
+
+				})
+				.catch((error) => {
+
+					console.log(error);
+					done(error);
+
+				});
+
+		});
+
+		it('should create user', (done) => {
+
+			let id = 4;
+			let name = 'Den';
+			let email = 'den@gmail.com';
+
+			let query = `insertUser{user: createUser(id: "${id}",name: "${name}",email: "${email}"){id name email tasks{title,text,created_at}}}`;
+
+			fetch('http://localhost:8989/graphql', {
+
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					query: `mutation ${query}`
+				})
+			})
+				.then(response => {
+
+					response.json().then(data => {
+
+						expect(data.data.user).to.be.an('object')
+							.with.property('id')
+							.that.equals('4');
+
+						done();
+
+					});
+
+				})
+				.catch((error) => {
+
+					console.log(error);
+					done(error);
+
+				});
 
 		});
 

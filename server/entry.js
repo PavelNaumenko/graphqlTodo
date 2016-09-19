@@ -26,6 +26,17 @@ app.get('/', (req, res) => {
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+//Allow access
+app.all('/*', (request, response, next) => {
+
+	response.header('Access-Control-Allow-Origin', '*');
+	response.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+	response.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, PATCH, OPTIONS');
+
+	next();
+
+});
+
 // mount express-graphql as a route handlermount express-graphql as a route handler
 
 app.use('/graphql', graphqlHTTP({
