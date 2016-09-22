@@ -6,7 +6,7 @@ import {
 } from 'graphql';
 
 import { User, Task } from '../types';
-import { UserList, TaskList } from '../data';
+import { UserModel } from '../../models';
 
 const Query = new GraphQLObjectType({
 
@@ -17,26 +17,18 @@ const Query = new GraphQLObjectType({
 			type: new GraphQLList(User),
 			resolve() {
 
-				return UserList;
+				return UserModel.getAll();
 
 			}
 		},
 		user: {
 			type: User,
 			args: {
-				id: { type: new GraphQLNonNull(GraphQLString) }
+				_id: { type: new GraphQLNonNull(GraphQLString) }
 			},
-			resolve(root, { id }) {
+			resolve(root, { _id }) {
 
-				let user = UserList.find(user => user.id == id);
-
-				if (!(user)) {
-
-					throw new Error('User with this id does not exist!');
-
-				}
-
-				return user;
+				return UserModel.getOne({ _id });
 
 			}
 

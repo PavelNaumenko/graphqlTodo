@@ -2,19 +2,42 @@ import { expect } from 'chai';
 import { graphql } from 'graphql';
 import TodoSchema from '../state/schema';
 import fetch from 'node-fetch';
+import config from 'config';
+import mongoose from 'mongoose';
+
+before((done) => {
+
+	mongoose.connect(config['development'].DATABASE, (error) => {
+
+		if (error) {
+
+			console.log(`Error: ${error}`);
+			done(error);
+
+		} else {
+
+			console.log('//        Connected to API db        //');
+			done();
+
+		}
+
+	});
+
+});
 
 describe('User test', () => {
+
+	let userId;
 
 	describe('#create()', () => {
 
 		let query = `
 				mutation insertUser {
 				  user: createUser(
-					id: "4",
 					name: "Den",
 					email: "den@gmail.com"
 				  )  {
-					id
+					_id
 					name
 					email
 					tasks {
@@ -33,6 +56,8 @@ describe('User test', () => {
 
 				user = result.data.user;
 
+				userId = user._id;
+
 				done();
 
 			}).catch((err) => {
@@ -46,8 +71,8 @@ describe('User test', () => {
 		it('should return data of created user', (done) => {
 
 			expect(user).to.be.an('object')
-				.with.property('id')
-				.that.equals('4');
+				.with.property('name')
+				.that.equals('Den');
 
 			done();
 
@@ -63,22 +88,6 @@ describe('User test', () => {
 
 		});
 
-		it('should return a error when try create a existing user', (done) => {
-
-			graphql(TodoSchema, query).then((result) => {
-
-				expect(result).to.have.property('errors');
-
-				done();
-
-			}).catch((err) => {
-
-				done(err);
-
-			});
-
-		});
-
 		it('should return a error when try to create user without required fields', (done) => {
 
 			let query = `
@@ -86,7 +95,7 @@ describe('User test', () => {
 				  user: createUser(
 					email: "den@gmail.com"
 				  )  {
-					id
+					_id
 					name
 					email
 					tasks {
@@ -117,12 +126,12 @@ describe('User test', () => {
 			let query = `
 				mutation insertUser {
 				  user: createUser(
-					id: "4",
+					_id: "4",
 					name: "Den",
 					email: "den@gmail.com",
 					some: 4
 				  )  {
-					id
+					_id
 					name
 					email
 					tasks {
@@ -157,23 +166,22 @@ describe('User test', () => {
 			let query = `
 				{
 				  users {
-					id,
+					_id,
 					name,
 					email,
 					tasks {
-					  id
+					  _id
 					  title,
 					  text,
 					  created_at
 					}
 				  }
-				}            
+				}     
 			`;
 
 			graphql(TodoSchema, query).then((result) => {
 
-				expect(result.data.users).to.be.an('array')
-					.and.to.have.lengthOf(4);
+				expect(result.data.users).to.be.an('array');
 
 				done();
 
@@ -193,12 +201,12 @@ describe('User test', () => {
 
 			let query = `
 				{
-				  user(id: "4") {
-					id,
+				  user(_id: "${userId}") {
+					_id,
 					name,
 					email,
 					tasks {
-					  id
+					  _id
 					  title,
 					  text,
 					  created_at
@@ -210,8 +218,8 @@ describe('User test', () => {
 			graphql(TodoSchema, query).then((result) => {
 
 				expect(result.data.user).to.be.an('object')
-					.with.property('id')
-					.that.equals('4');
+					.with.property('_id')
+					.that.equals(userId);
 
 				done();
 
@@ -227,12 +235,12 @@ describe('User test', () => {
 
 			let query = `
 				{
-				  user(id: "7") {
-					id,
+				  user(_id: "7") {
+					_id,
 					name,
 					email,
 					tasks {
-					  id
+					  _id
 					  title,
 					  text,
 					  created_at
@@ -264,7 +272,7 @@ describe('User test', () => {
 			let query = `
 				mutation updateUser {
 				  user: updateUser(
-					id: "4",
+					_id: "${userId}",
 					new_name: "Bob"
 				  )  {
 					name
@@ -299,7 +307,7 @@ describe('User test', () => {
 			let query = `
 				mutation updateUser {
 				  user: updateUser(
-					id: "7",
+					_id: "7",
 					new_name: "Bob"
 				  )  {
 					name
@@ -336,7 +344,7 @@ describe('User test', () => {
 			let query = `
 				mutation deleteUser {
 				  user: deleteUser(
-					id: "4"
+					_id: "${userId}"
 				  )  {
 					name
 					email
@@ -370,7 +378,7 @@ describe('User test', () => {
 			let query = `
 				mutation deleteUser {
 				  user: deleteUser(
-					id: "7"
+					_id: "7"
 				  )  {
 					name
 					email
@@ -403,6 +411,8 @@ describe('User test', () => {
 
 describe('Task test', () => {
 
+	let taskId;
+
 	describe('#create()', () => {
 
 		it('should return data of created task', (done) => {
@@ -410,12 +420,11 @@ describe('Task test', () => {
 			let query = `
 				mutation taskUser {
 				  task: createTask(
-					id: "5",
 					title: "Some",
 					text: "Some text",
-					userId: "2"
+					userId: "57e2aa817c5edf71652912a9"
 				  )  {
-					id,
+					_id,
 					title,
 					text,
 					created_at,
@@ -427,8 +436,10 @@ describe('Task test', () => {
 			graphql(TodoSchema, query).then((result) => {
 
 				expect(result.data.task).to.be.an('object')
-					.with.property('id')
-					.that.equals('5');
+					.with.property('title')
+					.that.equals('Some');
+
+				taskId = result.data.task._id;
 
 				done();
 
@@ -449,10 +460,10 @@ describe('Task test', () => {
 			let query = `
 				mutation taskUser {
 				  task: updateTask(
-					id: "5",
+					_id: "${taskId}",
 					new_title: "New title"
 				  )  {
-					id,
+					_id,
 					title,
 					text,
 					created_at,
@@ -486,9 +497,9 @@ describe('Task test', () => {
 			let query = `
 				mutation taskUser {
 				  task: deleteTask(
-					id: "5"
+					_id: "${taskId}"
 				  )  {
-					id,
+					_id,
 					title,
 					text,
 					created_at,
@@ -500,8 +511,8 @@ describe('Task test', () => {
 			graphql(TodoSchema, query).then((result) => {
 
 				expect(result.data.task).to.be.an('object')
-					.with.property('id')
-					.that.equals('5');
+					.with.property('_id')
+					.that.equals(taskId);
 
 				done();
 
@@ -523,13 +534,12 @@ describe('Request test', () => {
 		
 		it('should return users data', (done) => {
 			
-			fetch('http://localhost:8989/graphql?query={users{id,name,email,tasks{id,title,text,created_at}}}')
+			fetch('http://localhost:8989/graphql?query={users{_id,name,email,tasks{_id,title,text,created_at}}}')
 				.then((response) => {
 
 					response.json().then((data) => {
 
-						expect(data.data.users).to.be.an('array')
-							.and.to.have.lengthOf(3);
+						expect(data.data.users).to.be.an('array');
 
 						done();
 
@@ -538,7 +548,6 @@ describe('Request test', () => {
 				})
 				.catch((error) => {
 
-					console.log(error);
 					done(error);
 
 				});
@@ -547,14 +556,14 @@ describe('Request test', () => {
 
 		it('should return user by id', (done) => {
 
-			fetch('http://localhost:8989/graphql?query={user(id: "2"){id,name,email,tasks{id,title,text,created_at}}}')
+			fetch('http://localhost:8989/graphql?query={user(_id: "57e2aa817c5edf71652912a9"){_id,name,email,tasks{_id,title,text,created_at}}}')
 				.then((response) => {
 
 					response.json().then((data) => {
 
 						expect(data.data.user).to.be.an('object')
-							.with.property('id')
-							.that.equals('2');
+							.with.property('_id')
+							.that.equals('57e2aa817c5edf71652912a9');
 
 						done();
 
@@ -563,7 +572,6 @@ describe('Request test', () => {
 				})
 				.catch((error) => {
 
-					console.log(error);
 					done(error);
 
 				});
@@ -572,11 +580,10 @@ describe('Request test', () => {
 
 		it('should create user', (done) => {
 
-			let id = 4;
 			let name = 'Den';
 			let email = 'den@gmail.com';
 
-			let query = `insertUser{user: createUser(id: "${id}",name: "${name}",email: "${email}"){id name email tasks{title,text,created_at}}}`;
+			let query = `insertUser{user: createUser(name: "${name}",email: "${email}"){_id name email tasks{title,text,created_at}}}`;
 
 			fetch('http://localhost:8989/graphql', {
 
@@ -593,8 +600,8 @@ describe('Request test', () => {
 					response.json().then(data => {
 
 						expect(data.data.user).to.be.an('object')
-							.with.property('id')
-							.that.equals('4');
+							.with.property('name')
+							.that.equals('Den');
 
 						done();
 
@@ -603,7 +610,6 @@ describe('Request test', () => {
 				})
 				.catch((error) => {
 
-					console.log(error);
 					done(error);
 
 				});

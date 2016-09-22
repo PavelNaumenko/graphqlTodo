@@ -10,11 +10,11 @@
 
 {
   users {
-    id,
+    _id,
     name,
     email,
     tasks {
-      id
+      _id
       title,
       text,
       created_at
@@ -27,12 +27,12 @@
 */
 
 {
-  user(id: "2") {
-    id,
+  user(_id: "2") {
+    _id,
     name,
     email,
     tasks {
-      id
+      _id
       title,
       text,
       created_at
@@ -46,7 +46,6 @@
 
 mutation insertUser {
   user: createUser(
-    id: "4",
     name: "Den",
   	email: "den@gmail.com"
   )  {
@@ -66,7 +65,7 @@ mutation insertUser {
 
 mutation updateUser {
   user: updateUser(
-    id: "4",
+    _id: "4",
     new_name: "Bob"
   )  {
     name
@@ -85,7 +84,7 @@ mutation updateUser {
 
 mutation deleteUser {
   user: deleteUser(
-    id: "4"
+    _id: "4"
   )  {
     name
     email
@@ -109,12 +108,11 @@ mutation deleteUser {
 
 mutation taskUser {
   task: createTask(
-    id: "5",
     title: "Some",
   	text: "Some text",
     userId: "2"
   )  {
-    id,
+    _id,
     title,
     text,
     created_at,
@@ -128,10 +126,10 @@ mutation taskUser {
 
 mutation taskUser {
   task: updateTask(
-    id: "5",
+    _id: "5",
     new_title: "New title"
   )  {
-    id,
+    _id,
     title,
     text,
     created_at,
@@ -145,9 +143,9 @@ mutation taskUser {
 
 mutation taskUser {
   task: deleteTask(
-    id: "5"
+    _id: "5"
   )  {
-    id,
+    _id,
     title,
     text,
     created_at,

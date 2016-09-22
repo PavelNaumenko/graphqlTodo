@@ -11,8 +11,18 @@ const mode = process.env.NODE_ENV;
 const app = express();
 
 // Connect to DB
-mongoose.connect(config[mode].DATABASE, () => {
-	console.log('//        Connected to API db        //');
+mongoose.connect(config[mode].DATABASE, (error) => {
+
+	if (error) {
+
+		console.log(`Error: ${error}`);
+
+	} else {
+
+		console.log('//        Connected to API db        //');
+		
+	}
+
 });
 
 // Showing server view
